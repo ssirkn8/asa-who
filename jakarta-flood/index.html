@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two Ways of Seeing: Subsidence, Waterboom, and Everything in Between</title>
+
+    <!-- MapLibre GL JS -->
+    <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+
+    <!-- Scrollama for scroll-driven storytelling -->
+    <script src="https://unpkg.com/scrollama@3.2.0/build/scrollama.min.js"></script>
+
+    <!-- PMTiles for vector tile serving -->
+    <script src="https://unpkg.com/pmtiles@3.2.0/dist/pmtiles.js"></script>
+
+    <!-- Fonts: Newsreader (editorial serif) + Source Sans 3 (clean body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Shared favicon bundle -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="icon" href="../favicon.ico" sizes="any">
+    <link rel="manifest" href="../site.webmanifest">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Our styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="#scrolly" class="skip-link">Skip to map</a>
+
+    <!-- BACK NAV -->
+    <nav class="project-nav" aria-label="Portfolio navigation">
+        <a href="../">← Muhammad Asa</a>
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+            <span class="theme-toggle-icon" aria-hidden="true"></span>
+        </button>
+    </nav>
+
+    <!-- HEADER -->
+    <header class="header">
+        <p class="kicker">Empowering Resilience in a Sinking City</p>
+        <h1>Two Ways of Seeing: Subsidence, Waterboom, and Everything in Between</h1>
+        <p class="subtitle">How computational modeling and participatory research together describe flood resilience in Jakarta</p>
+        <p class="byline">By Muhammad Asa · March 2026</p>
+        <p class="byline-affiliation">Resilience Development Initiative · Funded by the British Academy</p>
+    </header>
+
+    <!-- INTRO SECTION -->
+    <section class="intro">
+        <p class="intro-lede">
+            Jakarta is sinking. Land subsidence exacerbates flood risk each
+            year, threatening what lies above ground with submergence, if not
+            by water, then by earth. This project brought together data
+            science, social science, and arts and humanities approaches to
+            study flood resilience in Jakarta. I contributed to the data
+            science work, including building-typology prediction from
+            street-level imagery using vision-language models and
+            land-subsidence modeling from time-series satellite radar data.
+        </p>
+        <p>
+            In particular, the building-typology prediction pipeline depends
+            on Street View imagery. The algorithm could only see what Street
+            View cameras could reach. In the narrow alleyways of North Jakarta's fishing
+            villages, where concrete meets tidal water and houses stand on
+            stilts, the camera never arrived. The buildings the model missed
+            most are the ones that need attention most.
+        </p>
+        <p>
+            This is where other approaches help cover the blind spots of data
+            science. Community engagement surfaced forms of knowledge that
+            satellite sensors cannot capture, showing how people actually live
+            with flooding. These "other ways of seeing" brought critical
+            nuance to the modeling and helped fill what the algorithm could
+            not see.
+        </p>
+        <p>
+            This is a story told in two ways: through the algorithm and the
+            people.
+        </p>
+    </section>
+
+    <nav class="chapter-nav" aria-label="Project sections">
+        <div class="chapter-nav-inner">
+            <a href="#part-1" class="chapter-nav-link is-active" data-nav-target="part-1" aria-current="location">01 Sinking City</a>
+            <a href="#part-2" class="chapter-nav-link" data-nav-target="part-2">02 What the Algorithm Sees</a>
+            <a href="#part-3" class="chapter-nav-link" data-nav-target="part-3">03 The Gap</a>
+            <a href="#part-4" class="chapter-nav-link" data-nav-target="part-4">04 The Other Way</a>
+            <a href="#part-5" class="chapter-nav-link" data-nav-target="part-5">05 Life in the Kampung</a>
+            <a href="#part-6" class="chapter-nav-link" data-nav-target="part-6">06 Both Ways of Seeing</a>
+            <a href="#tech-stack" class="chapter-nav-link" data-nav-target="tech-stack">Technical Stack</a>
+            <a href="#methods" class="chapter-nav-link" data-nav-target="methods">Methods</a>
+        </div>
+    </nav>
+
+    <!-- SCROLLYTELLING SECTION -->
+    <section id="scrolly" aria-label="Scrollytelling map and narrative">
+        <!-- The map (sticky, stays in place while scrolling) -->
+        <div class="sticky-map">
+            <div id="map" role="application" aria-label="Interactive map of Jakarta flood risk"></div>
+
+            <!-- Photo overlay for The Other Way transition (Part 4) -->
+            <div id="flip-overlay" class="flip-overlay">
+                <img src="img/q8.jpeg" alt="Government infrastructure construction site in Kamal Muara, built without community consultation" class="flip-photo">
+            </div>
+
+            <div class="map-controls" aria-live="polite">
+                <!-- Typology layer selector (shown at algorithm-gap step) -->
+                <fieldset id="typology-selector" class="typology-selector" aria-label="Building typology layer">
+                    <legend class="sr-only">Select building typology to display</legend>
+                    <button
+                        id="typology-selector-toggle"
+                        class="typology-selector-toggle"
+                        type="button"
+                        aria-expanded="false"
+                        aria-controls="typology-selector-options"
+                    >
+                        <span class="typology-selector-heading">
+                            <span class="typology-selector-title">Building Typology</span>
+                            <span id="typology-selector-current" class="typology-selector-current">Material</span>
+                        </span>
+                        <span class="typology-selector-chevron" aria-hidden="true"></span>
+                    </button>
+                    <div id="typology-selector-options" class="typology-selector-options">
+                        <label class="typology-option">
+                            <input type="radio" name="typology" value="construction" checked>
+                            <span>Material</span>
+                        </label>
+                        <label class="typology-option">
+                            <input type="radio" name="typology" value="currentuse">
+                            <span>Use</span>
+                        </label>
+                        <label class="typology-option">
+                            <input type="radio" name="typology" value="storeys">
+                            <span>Storeys</span>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <!-- Map legend (content swapped by JS per step) -->
+                <div id="legend" class="map-legend"></div>
+            </div>
+        </div>
+
+        <!-- Story steps (these scroll over the map) -->
+        <article class="story">
+
+            <!-- ==========================================
+                 PART 1: THE SINKING CITY
+                 ========================================== -->
+            <div id="part-1" class="step step--quant" data-step="sinking-city" data-part="1">
+                <span class="step-label">Part 1</span>
+                <h2>The Sinking City</h2>
+                <p>
+                    Jakarta sits on an alluvial plain at the mouths of
+                    13 rivers, home to more than 11 million people and 1.6
+                    million buildings. Decades of groundwater extraction have
+                    set the city on a path that no flood infrastructure can
+                    fully reverse: the land itself is sinking.
+                </p>
+                <p>
+                    Satellite radar measurements from 2016 to 2024 show that
+                    subsidence is not distributed uniformly. The map reveals where the
+                    ground is dropping fastest, on average, in 2024.
+                </p>
+                <p class="data-callout">
+                    <span class="data-number">1,651,218</span>
+                    <span class="data-label">building footprints mapped across Jakarta (OpenStreetMap)</span>
+                </p>
+                <p>
+                    To understand who is most vulnerable, the team built a
+                    flood risk model combining hazard
+                    and vulnerability variables in Jakarta.
+                </p>
+                <details class="tech-note">
+                    <summary class="tech-note-toggle">
+                        <span class="tech-note-icon">&#9881;</span> How I built this
+                    </summary>
+                    <div class="tech-note-content">
+                        <p>
+                            Data pipeline: satellite data acquisition
+                            (Sentinel-1 SAR, 2016–2024), time series processing
+                            via LiCSBAS2, ground-truth validation against GNSS
+                            measurements, and interpolation (kriging in
+                            QGIS).
+                        </p>
+                        <p class="tech-note-repo">
+                            Paper and GitHub repository forthcoming.
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ==========================================
+                 PART 2: WHAT THE ALGORITHM SEES
+                 ========================================== -->
+            <div id="part-2" class="step step--quant" data-step="algorithm-risk" data-part="2">
+                <span class="step-label">Part 2</span>
+                <h2>What the Algorithm Sees</h2>
+                <p>
+                    Zooming into North Jakarta, every <i>kecamatan</i>
+                    (subdistrict) carries a composite flood risk score derived
+                    from two inputs: how frequent and deep the flooding is and
+                    how socially vulnerable the kecamatan is.
+                </p>
+                <p>
+                    The colors represent that combined variables. Inheriting scores from each <i>kecamatan</i>, the reddest
+                    buildings face the highest convergence of hazard
+                    and vulnerability.
+                </p>
+                <p>
+                    One limitation is visible in the coloring itself: flood-related
+                    metrics were computed at the <i>kecamatan</i> level,
+                    producing the blocky, uniform patterns across the map.
+                    Buildings within the same <i>kecamatan</i> share the same
+                    hazard and vulnerability values, masking the variation that
+                    exists between buildings. If only building-level data
+                    existed, this variation could be captured more precisely.
+                </p>
+            </div>
+
+            <div class="step step--quant" data-step="algorithm-gap" data-part="2">
+                <h3>Filling the Data Gap</h3>
+                <p>
+                    Jakarta's building data has significant gaps in physical
+                    characteristics, such as construction materials, building use, and
+                    height. This information is essential for physical
+                    vulnerability analysis, which feeds directly into risk
+                    modeling. At scale, it could help policymakers prioritize
+                    interventions and reduce risk where it is needed most.
+                </p>
+                <p>
+                    To fill this gap, the research team applied three
+                    vision-language models to predict building typologies from
+                    Google Street View imagery in Kecamatan Penjaringan, North
+                    Jakarta. From 63,729 raw Street View images, quality
+                    filtering narrowed the set to 29,937 buildings that
+                    received predictions.
+                </p>
+                <p>
+                    But coverage was uneven, even within Penjaringan. The model
+                    could only predict buildings on streets wide enough for the
+                    Street View vehicle to reach. When we zoom into two
+                    neighborhoods, the unevenness sharpens.
+                </p>
+                <details class="tech-note">
+                    <summary class="tech-note-toggle">
+                        <span class="tech-note-icon">&#9881;</span> How I built this
+                    </summary>
+                    <div class="tech-note-content">
+                        <p>
+                            End-to-end ML classification pipeline: data
+                            acquisition via the Google Street View API (63,729
+                            images), multi-stage data validation (error
+                            filtering, spatial buffer, LLaVA-NeXT quality
+                            screening), prompt engineering across four
+                            strategies, and multi-model evaluation using three
+                            vision-language models (Gemini 2.0 Flash, GPT-4o,
+                            Claude 3.5 Sonnet). Built in Python.
+                        </p>
+                        <p class="tech-note-repo">
+                            Paper and GitHub repository forthcoming.
+                        </p>
+                        <p>
+                            Accuracy assessment is described in the
+                            <a href="#method-building-typology">methods section</a> below.
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ==========================================
+                 PART 3: THE GAP
+                 ========================================== -->
+            <div id="part-3" class="step step--quant step--gap" data-step="the-gap" data-part="3">
+                <span class="step-label">Part 3</span>
+                <h2>The Gap</h2>
+                <p>
+                    Our study areas comprised two neighborhoods in Penjaringan,
+                    North Jakarta. Both are fishing villages. Both sit on
+                    sinking ground. And yet, the algorithm revealed very
+                    different results.
+                </p>
+                <div class="comparison">
+                    <div class="comparison-col">
+                        <h3>RW 04 Kamal Muara</h3>
+                        <p class="data-callout">
+                            <span class="data-number">43.9%</span>
+                            <span class="data-label">of buildings unpredicted</span>
+                        </p>
+                        <p class="data-detail">535 buildings, 235 with no prediction</p>
+                        <div class="video-wrapper">
+                            <video class="comparison-video" src="img/rw04.mp4"
+                                   autoplay muted loop playsinline
+                                   aria-label="Street-level footage of RW 04 Kamal Muara"></video>
+                            <button class="video-audio-toggle" aria-label="Unmute video"></button>
+                        </div>
+                    </div>
+                    <div class="comparison-col">
+                        <h3>RW 22 Muara Angke</h3>
+                        <p class="data-callout">
+                            <span class="data-number">84.3%</span>
+                            <span class="data-label">of buildings unpredicted</span>
+                        </p>
+                        <p class="data-detail">728 buildings, 614 with no prediction</p>
+                        <div class="video-wrapper">
+                            <video class="comparison-video" src="img/rw22.mp4"
+                                   autoplay muted loop playsinline
+                                   aria-label="Street-level footage of RW 22 Muara Angke"></video>
+                            <button class="video-audio-toggle" aria-label="Unmute video"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step step--quant step--gap" data-step="gap-explanation" data-part="3">
+                <h3>Land Tenure, Not Street Width</h3>
+                <p>
+                    The gap is not a random technical limitation. RW 04's wider
+                    streets reflect a history of land formalization that made
+                    road construction and infrastructure upgrades possible.
+                    Street View vehicles could drive in. Our models could see.
+                </p>
+                <p>
+                    RW 22's density tells a different story. Many residents
+                    were displaced from other parts of North Jakarta years,
+                    and in some cases decades, ago. They resettled on land
+                    whose legal status remained largely unresolved at the time
+                    of the research. Without formal tenure, government
+                    infrastructure rarely follows. Alleys stay narrow. The
+                    camera never comes. Structural inequality becomes one of
+                    the algorithm's blind spots.
+                </p>
+                <p>
+                    Even with RW 04's higher Street View coverage, the
+                    algorithm can only go so far. It cannot access the
+                    material realities of community life: which places people
+                    return to, how they relate to one another, and how they
+                    live with flooding.
+                </p>
+                <p>
+                    Fortunately, this limitation was anticipated. In parallel,
+                    the research design included direct engagement with
+                    communities to address it.
+                </p>
+            </div>
+
+            <!-- ==========================================
+                 PART 4: THE OTHER WAY
+                 ========================================== -->
+            <div id="part-4" class="step step--transition" data-step="the-flip" data-part="4">
+                <span class="step-label">Part 4</span>
+                <h2>The Other Way</h2>
+                <p>Same place. Different way of seeing.</p>
+                <p class="flip-context">
+                    While the modeling work mapped risk from above, a parallel
+                    ethnographic study handed cameras to 15 young people aged
+                    18 to 25 in RW 04, Kamal Muara and RW 22, Muara Angke and asked them to photograph the
+                    places that matter to them. What they captured is not what
+                    any satellite or Street View vehicle could see.
+                </p>
+            </div>
+
+            <!-- ==========================================
+                 PART 5: LIFE IN THE KAMPUNG
+                 ========================================== -->
+
+            <!-- Theme A: Joy and Play -->
+            <div id="part-5" class="step step--ethno" data-step="kampung-joy" data-part="5">
+                <span class="step-label">Part 5</span>
+                <h2>Life in the Kampung</h2>
+                <h3 class="theme-heading">Joy and Play</h3>
+
+                <figure class="quote-block" data-quote-id="Q1">
+                    <img src="img/q1.jpeg"
+                         alt="Children swimming at Curug Eceng, a drainage overflow point in Muara Angke that youth have renamed as a waterfall play spot"
+                         class="quote-photo" loading="lazy">
+                    <blockquote>
+                        "We call this location a waterfall because the currents
+                        from the two areas collide, resulting in a strong
+                        current. Many children swim and play in this location,
+                        one of the exciting places and enjoy fate because of
+                        the continuous flooding."
+                    </blockquote>
+                    <figcaption>
+                        <span class="quote-location">Muara Angke (RW 22), "Curug Eceng"</span>
+                    </figcaption>
+                </figure>
+
+                <p>
+                    Where flood models see hazard, some of the youth of Muara Angke
+                    see a recreational opportunity. They renamed this drainage overflow
+                    "Curug Eceng," the waterfall. Down the road, a flooded
+                    alleyway becomes "Waterboom Gang 1," borrowing the name
+                    of commercial water parks. They find joy even in the harshest situations;
+                    a unique form of resilience.
+                </p>
+
+                <figure class="quote-block" data-quote-id="Q2">
+                    <img src="img/q2.jpeg"
+                         alt="View from Kamal Muara toward the PIK luxury development across the water channel that youth swim across"
+                         class="quote-photo" loading="lazy">
+                    <blockquote>
+                        "We swim to PIK a lot. Sometimes we get chased by
+                        security, but we're used to it. We always make it
+                        back."
+                    </blockquote>
+                    <figcaption>
+                        <span class="quote-location">Kamal Muara (RW 04), channel to PIK</span>
+                    </figcaption>
+                </figure>
+
+                <p>
+                    PIK is the gated luxury development visible across the
+                    water from Kamal Muara. Swimming there is recreation, but
+                    it is also a small act of negotiating a boundary.
+                </p>
+            </div>
+
+            <!-- Theme B: Care and Empathy -->
+            <div class="step step--ethno" data-step="kampung-care" data-part="5">
+                <h3 class="theme-heading">Care and Empathy</h3>
+
+                <figure class="quote-block" data-quote-id="Q5">
+                    <img src="img/q5.jpeg"
+                         alt="Mussel peeling site in Kamal Muara where elderly workers now face a longer, steeper walk due to seawall construction"
+                         class="quote-photo" loading="lazy">
+                    <blockquote>
+                        "Now that the shelling area is higher [following the
+                        seawall construction], they have to walk farther and
+                        climb more. It is tiring for them."
+                    </blockquote>
+                    <figcaption>
+                        <span class="quote-location">Kamal Muara (RW 04), mussel peeling site</span>
+                    </figcaption>
+                </figure>
+
+                <p>
+                    The seawall was built for protection. But for the elderly
+                    women who peel mussels for a living, it made their daily
+                    commute steeper and longer. Resilience infrastructure does
+                    not land equally on everyone.
+                </p>
+
+                <figure class="quote-block" data-quote-id="Q7">
+                    <img src="img/q7.jpeg"
+                         alt="A grandmother's house in the kampung, the reason one young person stays despite flood risk"
+                         class="quote-photo" loading="lazy">
+                    <blockquote>
+                        "This is why I stay. I don't want to leave her."
+                    </blockquote>
+                    <figcaption>
+                        <span class="quote-location">Muara Angke (RW 22), grandmother's house</span>
+                    </figcaption>
+                </figure>
+
+                <p>
+                    Resilience in the kampung is relational and
+                    intergenerational. One young person stays not because the
+                    flooding is manageable, but because leaving means leaving
+                    family behind.
+                </p>
+            </div>
+
+            <!-- Theme C: Spatial Exclusion -->
+            <div class="step step--ethno" data-step="kampung-exclusion" data-part="5">
+                <h3 class="theme-heading">Spatial Exclusion</h3>
+
+                <figure class="quote-block" data-quote-id="Q8">
+                    <img src="img/q8.jpeg"
+                         alt="Government infrastructure construction site in Kamal Muara, built without optimum community consultation"
+                         class="quote-photo" loading="lazy">
+                    <blockquote>
+                        "They build without asking. They just come. We adapt
+                        later."
+                    </blockquote>
+                    <figcaption>
+                        <span class="quote-location">Kamal Muara (RW 04), infrastructure site</span>
+                    </figcaption>
+                </figure>
+
+                <p>
+                    Government infrastructure arrives with improper implementation.
+                    Seawalls, roads, and reclamation projects reshape the
+                    landscape around the kampung while the people inside it
+                    adjust as best they can. The construction offered no choice
+                    for them but to adapt.
+                </p>
+
+                <p class="ethno-citation">
+                    Quotes and photographs from Darmawan et al. (2025).
+                </p>
+            </div>
+
+            <!-- ==========================================
+                 PART 6: BOTH WAYS OF SEEING
+                 ========================================== -->
+            <div id="part-6" class="step step--synthesis" data-step="both-ways" data-part="6">
+                <span class="step-label">Part 6</span>
+                <h2>Both Ways of Seeing</h2>
+                <p>
+                    Pull back to the city scale, and both layers are visible at
+                    once: the risk scores that algorithms compute and the lives
+                    that people actually lead in those same buildings.
+                </p>
+                <p>
+                    Neither view is complete on its own. The flood model tells
+                    us which areas face the highest risk. The
+                    ethnography tells us that hazard is not the whole story;
+                    that resilience is woven into relationships, humor, daily
+                    routines, and the stubborn act of staying.
+                </p>
+                <p>
+                    When both ways of seeing work together, something else
+                    becomes possible: risk assessments that account for what
+                    people value, not just what they stand to lose;
+                    infrastructure that serves the people it surrounds; and
+                    resilience building that begins by listening.
+                </p>
+                <details class="tech-note">
+                    <summary class="tech-note-toggle">
+                        <span class="tech-note-icon">&#9881;</span> How I built this
+                    </summary>
+                    <div class="tech-note-content">
+                        <p>
+                            This page serves 1.65 million building
+                            footprints as vector tiles (PMTiles generated via
+                            tippecanoe), with scroll-driven chapter transitions
+                            (Scrollama) and responsive map rendering (MapLibre
+                            GL JS). The frontend is vanilla HTML, CSS, and
+                            JavaScript, deployed as a static site. Explore the
+                            full technical details in the
+                            <a href="#methods">Methods section below</a>.
+                        </p>
+                    </div>
+                </details>
+            </div>
+
+        </article>
+    </section>
+
+    <!-- ==========================================
+         TECHNICAL STACK OVERVIEW
+         ========================================== -->
+    <section class="tech-overview" id="tech-stack">
+        <h2>Technical Stack</h2>
+        <p class="tech-overview-intro">
+            What I used to build this project, from raw satellite data to
+            interactive web map.
+        </p>
+        <div class="tech-grid">
+            <div class="tech-card">
+                <span class="tech-card-label">Data engineering</span>
+                <h3>Data Processing</h3>
+                <p class="tech-tools">Python · GeoPandas · rasterio · tippecanoe</p>
+                <p class="tech-metric">
+                    <span class="tech-number">1.65M</span> buildings processed
+                </p>
+            </div>
+            <div class="tech-card">
+                <span class="tech-card-label">End-to-end ML pipeline</span>
+                <h3>Vision-Language Models</h3>
+                <p class="tech-tools">Gemini 2.0 Flash · GPT-4o · Claude 3.5 Sonnet · LLaVA-NeXT</p>
+                <p class="tech-metric">
+                    <span class="tech-number">29,937</span> final images classified
+                </p>
+            </div>
+            <div class="tech-card">
+                <span class="tech-card-label">Time series analysis</span>
+                <h3>Remote Sensing</h3>
+                <p class="tech-tools">LiCSBAS2 · Sentinel-1 SAR · GNSS · QGIS</p>
+                <p class="tech-metric">
+                    <span class="tech-number">9-year</span> time series (2016–2024)
+                </p>
+            </div>
+            <div class="tech-card">
+                <span class="tech-card-label">Interactive web application</span>
+                <h3>Web Visualization</h3>
+                <p class="tech-tools">MapLibre GL JS · Scrollama · PMTiles</p>
+                <p class="tech-metric">
+                    Vanilla HTML/CSS/JS, static deploy
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         PART 7: METHODS AND DATA
+         ========================================== -->
+    <section class="methods" id="methods">
+        <h2>Methods and Data</h2>
+        <p class="methods-intro">
+            This story map draws on four interconnected research outputs from
+            the <a href="https://www.sinking-city.com/" target="_blank" rel="noopener">Empowering
+            Resilience in a Sinking City</a> project. Technical details for
+            each component are described below.
+        </p>
+
+        <!-- Building Typology Predictions -->
+        <details class="method-panel" id="method-building-typology">
+            <summary>
+                <h3>Building Typology Predictions</h3>
+                <span class="method-status method-status--forthcoming">Forthcoming</span>
+            </summary>
+            <div class="method-content">
+                <p class="method-role">
+                    <strong>My contribution:</strong> Full pipeline: data
+                    acquisition from the Street View API, multi-stage data
+                    validation and quality filtering, prompt engineering across
+                    four classification strategies (S-D, S-M, CoT-D, CoT-M),
+                    and multi-model evaluation with three VLMs. Presented at
+                    CUPUM 2025, UCL. Paper forthcoming.
+                </p>
+                <p>
+                    Three commercial vision-language models (Google Gemini 2.0
+                    Flash, OpenAI GPT-4o, Anthropic Claude 3.5 Sonnet)
+                    predicted construction material, current use, and number of
+                    storeys for buildings in Kecamatan Penjaringan from Google
+                    Street View imagery.
+                </p>
+                <h4>Pipeline</h4>
+                <ol class="method-steps">
+                    <li>
+                        <strong>Image query:</strong> Building centroid
+                        coordinates from the DKI Jakarta dataset queried
+                        against Google Street View Static API, yielding 63,729
+                        raw images.
+                    </li>
+                    <li>
+                        <strong>Pre-processing:</strong> Error image filtering
+                        (52,262 error-free), 10m road buffer intersection
+                        (36,022 spatially accurate), LLaVA-NeXT quality
+                        filtering, producing 29,937 analysis-ready
+                        building images.
+                    </li>
+                    <li>
+                        <strong>Prediction:</strong> Prompt optimization across
+                        four strategies (S-D, S-M, CoT-D, CoT-M), batch
+                        prediction with three VLMs, expert agreement evaluation
+                        for construction, current use, and storeys.
+                    </li>
+                </ol>
+                <h4>Cross-Typology Model Performance</h4>
+                <p>Combined metrics across three building typology
+                    predictions (construction material, current use,
+                    storeys):</p>
+                <div class="method-metrics">
+                    <div class="method-metric-item">
+                        <span class="method-metric-value">0.72</span>
+                        <span class="method-metric-label">Accuracy</span>
+                    </div>
+                    <div class="method-metric-item">
+                        <span class="method-metric-value">0.72</span>
+                        <span class="method-metric-label">Precision</span>
+                    </div>
+                    <div class="method-metric-item">
+                        <span class="method-metric-value">0.72</span>
+                        <span class="method-metric-label">Recall</span>
+                    </div>
+                    <div class="method-metric-item">
+                        <span class="method-metric-value">0.71</span>
+                        <span class="method-metric-label">F1 Score</span>
+                    </div>
+                </div>
+                <figure class="method-figure">
+                    <img src="img/building-typologies-pipeline.jpg"
+                         alt="Flowchart showing the three-phase building typology prediction pipeline: image query, pre-processing, and prediction with three vision-language models"
+                         loading="lazy">
+                    <figcaption>Building typology prediction pipeline</figcaption>
+                </figure>
+                <p class="method-citation">
+                    Citation forthcoming.
+                </p>
+                <p class="method-repo">
+                    Paper and GitHub repository forthcoming.
+                </p>
+            </div>
+        </details>
+
+        <!-- Flood Risk Modeling -->
+        <details class="method-panel">
+            <summary>
+                <h3>Flood Risk Modeling</h3>
+                <span class="method-status method-status--forthcoming">Forthcoming</span>
+            </summary>
+            <div class="method-content">
+                <p class="method-role">
+                    <strong>My contribution:</strong> I contributed the land
+                    subsidence modeling (see below), which served as one of
+                    the input variables for the flood risk scenarios prediction.
+                </p>
+                <p>
+                    Flood risk scores (exposure, hazard,
+                    vulnerability, risk) at <i>kecamatan</i>-level inherited to 1,651,218 buildings in
+                    Jakarta. Methodology details will be added when the
+                    publication is available.
+                </p>
+                <p class="method-citation">
+                    Citation forthcoming.
+                </p>
+                <p class="method-repo">
+                    Paper and GitHub repository forthcoming.
+                </p>
+            </div>
+        </details>
+
+        <!-- Land Subsidence Monitoring -->
+        <details class="method-panel">
+            <summary>
+                <h3>Land Subsidence Monitoring</h3>
+                <span class="method-status method-status--forthcoming">Forthcoming</span>
+            </summary>
+            <div class="method-content">
+                <p class="method-role">
+                    <strong>My contribution:</strong> Full remote sensing
+                    pipeline: LiCSBAS2 configuration, atmospheric correction,
+                    time series analysis, ground-truth validation against GNSS,
+                    and spatial interpolation (kriging) in QGIS.
+                </p>
+                <p>
+                    InSAR time series analysis of land subsidence in DKI
+                    Jakarta (2016-2024) using Sentinel-1 data processed with
+                    the LiCSBAS2 pipeline. Validated against GNSS ground truth
+                    at the CKJT station, with kriging interpolation for spatial
+                    mapping of annual subsidence velocities.
+                </p>
+                <h4>Pipeline</h4>
+                <ol class="method-steps">
+                    <li>
+                        <strong>LiCSBAS processing:</strong> Sentinel-1
+                        interferograms (frame 098A_09673_121312) processed
+                        through 16 steps, producing cumulative displacement and
+                        line-of-sight velocity layers.
+                    </li>
+                    <li>
+                        <strong>Time series extraction:</strong> Annual
+                        velocity layers computed for 2016-2024 at validation
+                        locations.
+                    </li>
+                    <li>
+                        <strong>GNSS validation:</strong> InSAR line-of-sight
+                        velocity compared against GNSS vertical
+                        velocity at the CKJT station in North Jakarta.
+                    </li>
+                    <li>
+                        <strong>Post-processing:</strong> Kriging
+                        interpolation in QGIS for continuous spatial coverage,
+                        clipped to DKI Jakarta boundary.
+                    </li>
+                </ol>
+                <p class="method-citation">
+                    Citation forthcoming. Subsidence data processed using
+                    LiCSBAS2 Morishita, Y. (2021). Nationwide urban ground
+                    deformation monitoring in Japan using Sentinel-1 LiCSAR
+                    products and LiCSBAS. <cite>Progress in Earth and Planetary
+                    Science</cite>, 8(1), 6.
+                    <a href="https://doi.org/10.1186/s40645-020-00402-7"
+                    target="_blank" rel="noopener">https://doi.org/10.1186/s40645-020-00402-7</a>
+                </p>
+                <p class="method-repo">
+                    Paper and GitHub repository forthcoming.
+                </p>
+            </div>
+        </details>
+
+        <!-- Ethnographic Research -->
+        <details class="method-panel">
+            <summary>
+                <h3>Ethnographic Research (Photovoice)</h3>
+                <span class="method-status method-status--published">Published</span>
+            </summary>
+            <div class="method-content">
+                <p class="method-role">
+                    <strong>My contribution:</strong> Collaborative fieldwork. I
+                    participated in interviews, focus groups, and
+                    observation/town-watching activities, and contributed to the
+                    study area map (Figure 1 in the published paper).
+                </p>
+                <p>
+                    Photovoice study with 15 youth aged 18-25 in RW 22 Muara
+                    Angke and RW 04 Kamal Muara, Penjaringan, North Jakarta.
+                    Fieldwork conducted October 2024 to March 2025.
+                    Participants documented their lived experience of flood
+                    risk through photography and narrative sharing.
+                </p>
+                <h4>Themes</h4>
+                <ul class="method-themes">
+                    <li>
+                        <strong>Joy and play:</strong> Youth reimagining
+                        flood-prone spaces as sites of recreation, identity,
+                        and belonging.
+                    </li>
+                    <li>
+                        <strong>Care and empathy:</strong> Intergenerational
+                        relationships, adaptation as relational practice,
+                        impact of infrastructure on elderly livelihoods.
+                    </li>
+                    <li>
+                        <strong>Spatial exclusion:</strong> Proximity to elite
+                        development, top-down infrastructure with improper
+                        consultation, displacement of gathering spaces.
+                    </li>
+                </ul>
+                <p class="method-citation">
+                    Darmawan, A. B., Adinta, U. N., Wimbadi, R. W., &amp;
+                    Colven, E. (2025). Between joy, care, and risk in the
+                    sinking city: Using photovoice to understand youth
+                    resilience in North Jakarta. <cite>Urban Geography</cite>.
+                    <a href="https://doi.org/10.1080/02723638.2025.2583952"
+                       target="_blank" rel="noopener">
+                        https://doi.org/10.1080/02723638.2025.2583952</a>
+                </p>
+            </div>
+        </details>
+
+        <!-- Data Sources -->
+        <details class="method-panel">
+            <summary>
+                <h3>Data Sources</h3>
+            </summary>
+            <div class="method-content">
+                <div class="data-table-wrap">
+                <table class="data-table">
+                    <caption class="sr-only">Datasets used in this story map</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Dataset</th>
+                            <th scope="col">Records</th>
+                            <th scope="col">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Building footprints</td>
+                            <td>1,651,218</td>
+                            <td>Polygon geometries from OpenStreetMap</td>
+                        </tr>
+                        <tr>
+                            <td>Building attributes</td>
+                            <td>1,651,218</td>
+                            <td>Public web tiles expose <code>dm_risk</code>, <code>has_ai_prediction</code>, and the three AI typology codes used by the Material, Use, and Storeys layers</td>
+                        </tr>
+                        <tr>
+                            <td>Subsidence raster</td>
+                            <td>1 raster</td>
+                            <td>Average 2024 velocity, InSAR + kriging, clipped to Jakarta</td>
+                        </tr>
+                        <tr>
+                            <td>Study area boundaries</td>
+                            <td>2 polygons</td>
+                            <td>RW 04 Kamal Muara, RW 22 Muara Angke</td>
+                        </tr>
+                        <tr>
+                            <td>Ethnographic quotes</td>
+                            <td>8 points</td>
+                            <td>Geocoded quotes with theme, speaker, photo location</td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+                <p>
+                    The full building typologies dataset and other building-level
+                    data will be published on the
+                    <a href="https://colouring-indonesia-web.sites.er.kcl.ac.uk/"
+                       target="_blank" rel="noopener">Colouring Indonesia</a>
+                    platform (currently under development).
+                </p>
+            </div>
+        </details>
+
+        <!-- Footer -->
+        <div class="methods-footer">
+            <h3>About This Project</h3>
+            <p>
+                This story map was created by
+                <a href="../">Muhammad Asa</a> as part of his contribution to the
+                <a href="https://www.sinking-city.com/" target="_blank" rel="noopener">Empowering
+                Resilience in a Sinking City</a> research project, funded by
+                the British Academy's ODA International Interdisciplinary Research Projects 2024.
+                The communities of RW 04 Kamal Muara and RW 22 Muara Angke made this research
+                possible. The youth participants who shared their photographs and words are its
+                foundation. Built with MapLibre GL JS, Scrollama, and vanilla HTML/CSS/JS.
+
+            </p>
+            <p>
+                <a href="../">← Back to portfolio</a>
+            </p>
+        </div>
+    </section>
+
+    <!-- Our JavaScript -->
+    <script src="main.js"></script>
+</body>
+</html>

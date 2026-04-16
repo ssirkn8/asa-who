@@ -1,0 +1,149 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.769421593822,
+          -6.10487161082449
+        ]
+      },
+      "properties": {
+        "id": "Q1",
+        "quote": "We call this location a waterfall because the currents from the two areas collide, resulting in a strong current. Many children swim and play in this location, one of the exciting places and enjoy fate because of the continuous flooding.",
+        "speaker": "Unnamed youth",
+        "location": "Muara Angke (RW22) \u2014 \"Curug Eceng\"",
+        "theme": "joy_play",
+        "photo": "../img/q1.jpeg"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.728262488168,
+          -6.0890429026524
+        ]
+      },
+      "properties": {
+        "id": "Q2",
+        "quote": "We swim to PIK a lot. Sometimes we get chased by security, but we're used to it. We always make it back.",
+        "speaker": "Unnamed youth",
+        "location": "Kamal Muara (RW04) \u2014 channel to PIK",
+        "theme": "joy_play",
+        "photo": "../img/q2.jpeg"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.72561289847,
+          -6.08922687124002
+        ]
+      },
+      "properties": {
+        "id": "Q3",
+        "quote": "We grill, we mokel [break the fast early], we just chill.",
+        "speaker": "Unnamed youth",
+        "location": "Kamal Muara (RW04) \u2014 Bale Knock",
+        "theme": "joy_play",
+        "photo": "../img/q3.jpeg"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.769043440322,
+          -6.10635813419629
+        ]
+      },
+      "properties": {
+        "id": "Q4",
+        "quote": "Free tourist attractions that are always crowded (with kids) during floods.",
+        "speaker": "Unnamed youth",
+        "location": "Muara Angke (RW22) \u2014 \"Waterboom Gang 1\"",
+        "theme": "joy_play",
+        "photo": "../img/q4.jpeg"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.727296969565,
+          -6.08973567903684
+        ]
+      },
+      "properties": {
+        "id": "Q5",
+        "quote": "Now that the shelling area is higher [following the seawall construction], they have to walk farther and climb more. It is tiring for them.",
+        "speaker": "Unnamed youth",
+        "location": "Kamal Muara (RW04) \u2014 mussel peeling site",
+        "theme": "care_empathy",
+        "photo": "../img/q5.jpeg"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.726793808875,
+          -6.09037759024034
+        ]
+      },
+      "properties": {
+        "id": "Q6",
+        "quote": "This is not made for them.",
+        "speaker": "Unnamed youth",
+        "location": "Kamal Muara (RW04) \u2014 elevated seawall area",
+        "theme": "care_empathy",
+        "photo": "../img/q6.jpeg"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.770255970342,
+          -6.10390395663206
+        ]
+      },
+      "properties": {
+        "id": "Q7",
+        "quote": "This is why I stay. I don't want to leave her.",
+        "speaker": "Unnamed youth",
+        "location": "Muara Angke (RW22) \u2014 grandmother's house",
+        "theme": "care_empathy",
+        "photo": "../img/q7.jpeg"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.726183546922,
+          -6.08854040943681
+        ]
+      },
+      "properties": {
+        "id": "Q8",
+        "quote": "They build without asking. They just come. We adapt later.",
+        "speaker": "Unnamed youth",
+        "location": "Kamal Muara (RW04) \u2014 infrastructure site",
+        "theme": "spatial_exclusion",
+        "photo": "../img/q8.jpeg"
+      }
+    }
+  ]
+}

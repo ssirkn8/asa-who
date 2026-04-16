@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muhammad Asa — Spatial Data Scientist</title>
+
+    <!-- Fonts: Newsreader (editorial serif) + Source Sans 3 (clean body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Shared favicon bundle -->
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="manifest" href="site.webmanifest">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- NAVIGATION -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo">Muhammad Asa</a>
+            <div class="nav-links">
+                <a href="#projects">Projects</a>
+                <a href="#contact">Contact</a>
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+                    <span class="theme-toggle-icon" aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO / INTRO -->
+    <header class="hero">
+        <p class="hero-label">Spatial Data Scientist</p>
+        <h1 class="hero-title">Muhammad Asa</h1>
+        <p class="hero-bio">
+            👋 Welcome to my portfolio! This is a growing repository of projects I have worked on,
+            presented in a data-journalism style. Each page is meant to show not
+            just the final output, but how the work was shaped: the question being asked, the
+            methods behind it, the technical stack that supports it, and the decisions that turned
+            analysis into something clear and usable. As more projects are added, this site offers
+            a practical view of how I approach complex problems and communicate them through
+            rigorous, accessible, and thoughtful work.
+        </p>
+    </header>
+
+    <!-- PROFESSIONAL PROJECTS -->
+    <section id="projects" class="projects">
+        <h2 class="section-label">Professional Projects</h2>
+        <div class="project-grid">
+
+            <!-- Project 1: Jakarta Flood Risk (British Academy) -->
+            <a href="jakarta-flood/" class="project-card project-card--featured">
+                <div class="project-card-body">
+                    <span class="project-number">01</span>
+                    <h3 class="project-title">Empowering Resilience in a Sinking City</h3>
+                    <p class="project-desc">
+                        This project employs computational modeling and participatory research to better understand community resilience in North Jakarta. Where the algorithm goes blind, the community provided guidance, and vice versa. This is the case for two ways of seeing a problem.
+                    </p>
+                    <ul class="project-meta">
+                        <li>Mar 2024 – Apr 2026</li>
+                        <li>Resilience Development Initiative</li>
+                        <li>Funded by the British Academy</li>
+                    </ul>
+                    <span class="project-tags">Python · VLMs (Gemini, GPT-4o, Claude) · InSAR · MapLibre GL · Scrollama · PMTiles</span>
+                    <span class="project-cta">View project →</span>
+                </div>
+                <div class="project-card-media" aria-hidden="true">
+                    <img src="jakarta-flood/img/q6.jpeg"
+                         alt=""
+                         class="project-card-image"
+                         loading="lazy">
+                </div>
+            </a>
+
+            <!-- Project 2: TBD -->
+            <div class="project-card project-card--placeholder">
+                <span class="project-number">02</span>
+                <h3 class="project-title">Coming Soon</h3>
+                <p class="project-desc">
+                    <!-- TODO: Add narrative/description -->
+                    A new project is in the works. Stay tuned.
+                </p>
+            </div>
+
+            <!-- Project 3: TBD -->
+            <div class="project-card project-card--placeholder">
+                <span class="project-number">03</span>
+                <h3 class="project-title">Coming Soon</h3>
+                <p class="project-desc">
+                    <!-- TODO: Add narrative/description -->
+                    A new project is in the works. Stay tuned.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="contact">
+        <h2 class="section-label">Get in Touch</h2>
+        <div class="contact-links">
+            <a href="https://www.linkedin.com/in/muhammadasa/" class="contact-link" target="_blank" rel="noopener">
+                LinkedIn ↗
+            </a>
+            <a href="mailto:mhdasa10@gmail.com" class="contact-link">
+                Email ↗
+            </a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p>© 2026 Muhammad Asa</p>
+    </footer>
+
+    <script>
+        // Theme system (shared with project pages via portfolio-theme key)
+        (function () {
+            const THEME_STORAGE_KEY = 'portfolio-theme';
+            const systemThemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+            function getStoredTheme() {
+                return localStorage.getItem(THEME_STORAGE_KEY);
+            }
+
+            function getTheme() {
+                return getStoredTheme() || (systemThemeQuery.matches ? 'dark' : 'light');
+            }
+
+            function apply(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                const btn = document.getElementById('theme-toggle');
+                if (btn) btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+            }
+
+            apply(getTheme());
+
+            document.getElementById('theme-toggle')?.addEventListener('click', () => {
+                const nextTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+                apply(nextTheme);
+            });
+
+            systemThemeQuery.addEventListener('change', (e) => {
+                if (!getStoredTheme()) {
+                    apply(e.matches ? 'dark' : 'light');
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

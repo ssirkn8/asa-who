@@ -1,0 +1,16 @@
+{
+  "rw22_muara_angke": {
+    "area": "RW22 Muara Angke",
+    "total_buildings": 728,
+    "ai_predicted_count": 114,
+    "ai_null_count": 614,
+    "ai_null_pct": 84.3
+  },
+  "rw04_kamal_muara": {
+    "area": "RW04 Kamal Muara",
+    "total_buildings": 535,
+    "ai_predicted_count": 300,
+    "ai_null_count": 235,
+    "ai_null_pct": 43.9
+  }
+}
